@@ -46,7 +46,7 @@ export default function Pairs() {
         <View style={{ flex: 1 }}>
           <Text style={{ ...t.typography.subtitle, color: t.colors.ink }}>Mix-ups</Text>
           <Text style={{ ...t.typography.caption, color: t.colors.inkMuted }}>
-            {data.live.length} pairs in {data.groups.length} {data.groups.length === 1 ? "tangle" : "tangles"} · fade over 3 weeks
+            {data.live.length} pairs in {data.groups.length} {data.groups.length === 1 ? "group" : "groups"} · fade over 3 weeks
           </Text>
         </View>
       </View>
@@ -56,6 +56,7 @@ export default function Pairs() {
         <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 40, gap: 12 }}>
           <Animated.View entering={FadeInDown.duration(360)} style={[styles.card, { backgroundColor: t.colors.surface, borderColor: t.colors.border }]}>
             <ConfusionWeb nodes={data.nodes} edges={data.live} selected={sel} onSelect={setSel} />
+            <View style={{ height: 8 }} />
             <Text style={{ ...t.typography.caption, color: t.colors.inkFaint, textAlign: "center" }}>Thicker line = mixed up more often lately. Tap a card to focus it.</Text>
           </Animated.View>
           <SectionTitle title={sel ? `Pairs with ${name(sel)?.front ?? ""}` : "All pairs"} right={sel ? <Text onPress={() => setSel(null)} style={{ ...t.typography.label, color: t.colors.mixup }}>Show all</Text> : undefined} />

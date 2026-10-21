@@ -55,11 +55,11 @@ export default function ForecastScreen() {
       ) : (
         <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 40, gap: 12 }}>
           <Animated.View entering={FadeInDown.duration(360)} style={[styles.card, { backgroundColor: t.colors.surface, borderColor: t.colors.border }]}>
-            <LoadChart demand={f.days.map((d) => d.demand)} compare={cmp.after.days.map((d) => d.demand)} budget={app.settings.budgetMin} selected={day} onSelect={setDay} />
+            <LoadChart demand={f.days.map((d) => d.demand)} compare={cmp.after.days.map((d) => d.demand)} budget={app.settings.budgetMin} compareBudget={mode === "budget" ? budget : undefined} selected={day} onSelect={setDay} />
             <Text style={{ ...t.typography.caption, color: t.colors.inkMuted, marginTop: 8 }}>
               {day !== null
                 ? `Day ${day + 1}: ${Math.round(f.days[day].demand)} min wanted (90% of runs under ${Math.round(f.days[day].p90)}), ${Math.round(f.days[day].served)} min done, ${f.days[day].backlog.toFixed(1)} cards left over → if: ${Math.round(cmp.after.days[day].demand)} min, ${cmp.after.days[day].backlog.toFixed(1)} left.`
-                : `Red = over your ${app.settings.budgetMin} min (cards slip to the next day). Yellow = the what-if below. Tap a day.`}
+                : `Red = over your ${app.settings.budgetMin} min (cards slip to the next day). Yellow = the what-if below${mode === "budget" ? ", amber line = its limit" : ""}. Tap a day.`}
             </Text>
           </Animated.View>
 
@@ -144,7 +144,7 @@ function Column({ title, backlog, retention, overflow, base }: { title: string; 
       <Text style={{ ...t.typography.caption, color: t.colors.inkMuted, marginTop: 6 }}>
         recall at review {Math.round(retention * 100)}%{base && dr !== 0 ? ` (${dr > 0 ? "+" : ""}${dr})` : ""}
       </Text>
-      <Text style={{ ...t.typography.caption, color: t.colors.inkMuted }}>{overflow} days over budget</Text>
+      <Text style={{ ...t.typography.caption, color: t.colors.inkMuted }}>{overflow} {overflow === 1 ? "day" : "days"} over budget</Text>
     </View>
   );
 }

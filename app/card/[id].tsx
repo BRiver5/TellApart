@@ -105,8 +105,7 @@ export default function CardDetail() {
                 <View style={{ flex: 1 }}>{p.value > 0 ? <View style={{ width: `${(p.value / maxPart) * 100}%`, height: 10, borderRadius: 3, backgroundColor: t.colors.right }} /> : null}</View>
               </View>
               <Text style={{ ...t.typography.caption, color: t.colors.ink, width: 40, textAlign: "right", fontWeight: "700" }}>
-                {p.value >= 0 ? "+" : ""}
-                {p.value.toFixed(1)}
+                {Math.abs(p.value) < 0.05 ? "0.0" : `${p.value > 0 ? "+" : ""}${p.value.toFixed(1)}`}
               </Text>
             </View>
           ))}

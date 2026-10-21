@@ -202,7 +202,7 @@ export default function Home() {
                         </Text>
                       </View>
                       <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, backgroundColor: p === null ? t.colors.surfaceAlt : p >= app.settings.target ? t.colors.rightSoft : t.colors.accentSoft }}>
-                        <Text style={{ fontSize: 11, fontWeight: "800", color: p === null ? t.colors.inkMuted : p >= app.settings.target ? t.colors.right : t.colors.accent }}>{c.suspended ? "paused" : p === null ? "new" : `${Math.round(p * 100)}%`}</Text>
+                        <Text style={{ fontSize: 11, fontWeight: "800", color: p === null ? t.colors.inkMuted : p >= app.settings.target ? t.colors.right : t.colors.accent }}>{c.suspended ? "paused" : p === null ? "new" : p < 0.01 ? "<1%" : `${Math.round(p * 100)}%`}</Text>
                       </View>
                     </PressableScale>
                   </SwipeRow>

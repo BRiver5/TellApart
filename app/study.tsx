@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -44,6 +44,14 @@ export default function Study() {
   const sessionStart = useRef(Date.now());
   const input = useRef<TextInput>(null);
 
+  // autoFocus на перемонтированном поле на Android не всегда поднимает клавиатуру —
+  // фокусируем явно после смены карточки.
+  useEffect(() => {
+    if (result || done) return;
+    const id = setTimeout(() => input.current?.focus(), 250);
+    return () => clearTimeout(id);
+  }, [i, result, done]);
+
   const item = queue[i];
   const card = item ? app.cards.find((c) => c.id === item.id) : undefined;
   const other = result?.confusedWith ? app.cards.find((c) => c.id === result.confusedWith) : undefined;
@@ -73,7 +81,6 @@ export default function Study() {
       return;
     }
     setI(i + 1);
-    setTimeout(() => input.current?.focus(), 50);
   };
 
   if (done || !card) {
@@ -90,7 +97,7 @@ export default function Study() {
             <Stat label="Mixed up" value={tally.confused} color={t.colors.mixup} />
             <Stat label="Not quite" value={tally.wrong} color={t.colors.accent} />
             <Text style={{ ...t.typography.caption, color: t.colors.inkMuted, marginTop: 4 }}>
-              {total} answers in about {mins} min. {tally.confused ? "Mixed-up pairs come back side by side next time." : "No mix-ups this time."}
+              {total} {total === 1 ? "answer" : "answers"} in about {mins} min. {tally.confused ? "Mixed-up pairs come back side by side next time." : "No mix-ups this time."}
             </Text>
           </Animated.View>
         ) : null}
@@ -137,12 +144,12 @@ export default function Study() {
           {result ? (
             <Animated.View entering={FadeInDown.duration(260)} style={{ gap: 8 }}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                {result.outcome === "correct" ? <Check size={18} color={tone} strokeWidth={3} /> : result.outcome === "confused" ? <ArrowLeftRight size={18} color={tone} /> : <X size={18} color={tone} strokeWidth={3} />}
+                {result.outcome === "correct" || result.outcome === "close" ? <Check size={18} color={tone} strokeWidth={3} /> : result.outcome === "confused" ? <ArrowLeftRight size={18} color={tone} /> : <X size={18} color={tone} strokeWidth={3} />}
                 <Text style={{ ...t.typography.subtitle, color: tone }}>{LABEL[result.outcome]}</Text>
               </View>
               {result.outcome === "correct" ? (
                 <Text style={{ fontSize: 22, fontWeight: "700", color: t.colors.ink }}>{card.back}</Text>
-              ) : typed.trim() ? (
+              ) : typed.trim() && result.outcome !== "confused" && result.distance <= Math.max(2, card.back.length / 2) ? (
                 <AnswerDiff typed={typed} correct={card.back} />
               ) : (
                 <Text style={{ fontSize: 22, fontWeight: "700", color: t.colors.right }}>{card.back}</Text>
@@ -154,7 +161,7 @@ export default function Study() {
                 </View>
               ) : null}
               <Text style={{ ...t.typography.caption, color: t.colors.inkMuted }}>
-                {result.p > 0 ? `Model gave you ${Math.round(result.p * 100)}% for this one.` : "First time seeing this card."}
+                {result.p > 0 ? `Model gave you ${result.p < 0.01 ? "under 1" : Math.round(result.p * 100)}% for this one.` : "First time seeing this card."}
                 {nextIsPartner ? " Its look-alike is next." : ""}
               </Text>
             </Animated.View>

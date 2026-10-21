@@ -17,7 +17,7 @@ function Bar({ h, color, delay }: { h: number; color: string; delay: number }) {
 // Нагрузка по дням: столбец — сколько минут просят карточки, черта — дневной
 // лимит, часть над лимитом — красная (это и есть будущий долг). Второй ряд
 // (если передан) — сравнение "если" тонкими столбиками поверх. Тап — день.
-export function LoadChart({ demand, compare, budget, selected, onSelect, height = 130 }: { demand: number[]; compare?: number[]; budget: number; selected: number | null; onSelect: (d: number | null) => void; height?: number }) {
+export function LoadChart({ demand, compare, budget, compareBudget, selected, onSelect, height = 130 }: { demand: number[]; compare?: number[]; budget: number; compareBudget?: number; selected: number | null; onSelect: (d: number | null) => void; height?: number }) {
   const t = useTheme();
   const max = Math.max(budget * 1.4, ...demand, ...(compare ?? []));
   const y = (m: number) => (m / max) * height;
@@ -25,6 +25,7 @@ export function LoadChart({ demand, compare, budget, selected, onSelect, height 
     <View>
       <View style={{ height, flexDirection: "row", alignItems: "flex-end", gap: 2 }}>
         <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: y(budget), borderTopWidth: 1.5, borderStyle: "dashed", borderColor: t.colors.ink, zIndex: 2 }} />
+        {compareBudget !== undefined && compareBudget !== budget ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: y(compareBudget), borderTopWidth: 2, borderStyle: "dashed", borderColor: t.colors.close, zIndex: 2 }} /> : null}
         {demand.map((m, i) => {
           const over = Math.max(0, m - budget);
           return (

@@ -1,18 +1,20 @@
 # Tell Apart
 
-**{{TAGLINE}}**
+**Learn the things you mix up.**
 
-{{Один абзац о том, что делает приложение и для кого.}}
+Карточки с вводом ответа. Опечатка засчитывается как «close», а ответ другой
+карточки — как путаница: такие пары попадают в граф путаниц и возвращаются
+рядом, пока ты не научишься их различать. Память моделируется регрессией
+периода полураспада с весами, которые учатся на твоих ответах. Полностью офлайн.
 
 ## Особенности
 
-- ...
-
-## Стек
-
-- Expo SDK 54 + expo-router, TypeScript
-- `expo-sqlite` — вся persistence локально на устройстве, интернет не нужен
-- `expo-notifications` / `expo-haptics` — если приложение их использует
+- Нечёткая проверка ответа и распознавание путаниц.
+- Half-Life Regression с онлайн-обучением общих весов и сложности карточки.
+- Граф путаниц с затуханием и ослаблением при верном различении.
+- Сессия под лимит времени — точный рюкзак, путающиеся карточки контрастными блоками.
+- Прогноз нагрузки на 30 дней (Монте-Карло), конфликты с проверенными выходами, what-if.
+- Stats: 8 секций, калибровка прогнозов модели.
 
 ## Запуск
 
@@ -21,23 +23,18 @@ npm install
 npx expo start
 ```
 
-`a` — Android, `i` — iOS, либо QR-код через Expo Go.
+## Проверки
+
+```bash
+npm run verify   # tsc + node --test + check-rules + expo export
+```
 
 ## Структура проекта
 
 ```
-app/            expo-router экраны
-src/
-  theme/        палитра, типографика, отступы, анимации
-  db/           expo-sqlite схема + миграции
-  data/         доступ к данным (замени items.example.ts)
-  services/     notifications, haptics
-  components/   переиспользуемые UI-примитивы
-  lib/          id, даты
-tools/          генератор иконок, проверки, rename-скрипт
+app/            экраны: index, study, card/[id], pairs, forecast, stats
+src/lib/        движок: match, memory, confusion, session, forecast, changes, conflicts, explain, replay, history, decks
+src/data/       repo.ts — доступ к SQLite (через мьютекс)
+src/store/      appStore.ts — журнал → модель и граф → сессия, прогноз, конфликты
+src/components/ SessionBar, AnswerDiff, ForgettingCurve, ConfusionWeb, LoadChart, CardSheet, SettingsSheet + шаблонные
 ```
-
-## Данные
-
-Все данные хранятся локально на устройстве. Регистрации нет, интернет не
-требуется для работы приложения.
